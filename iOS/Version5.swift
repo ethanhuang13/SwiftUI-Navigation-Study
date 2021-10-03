@@ -11,7 +11,7 @@ private extension EnvironmentValues {
   }
 }
 
-/// Refactor `Navigation`
+/// Refactor `Navigation` and `ListView`
 enum Version5 {
   struct NavigationKey: EnvironmentKey {
     static let defaultValue: Binding<Navigation> = .constant(.init())
@@ -28,9 +28,23 @@ enum Version5 {
 
     var isPushingDisplayView = false
 
-    mutating func reset() {
-      editorViewNoteId = nil
-      isPushingDisplayView = false
+    mutating func dismiss(toRoot: Bool = false) {
+      if toRoot {
+        editorViewNoteId = nil
+        isPushingDisplayView = false
+        return
+      }
+
+      guard editorViewNoteId != nil else {
+        // already in root
+        return
+      }
+
+      if isPushingDisplayView {
+        isPushingDisplayView = false
+      } else {
+        editorViewNoteId = nil
+      }
     }
   }
 
@@ -39,29 +53,54 @@ enum Version5 {
 
     var body: some View {
       NavigationView {
-        List {
-          ForEach($notes) { note in // Swift 5.5
-            NavigationLink(
-              tag: note.id.wrappedValue,
-              selection: $navigation.editorViewNoteId,
-              destination: {
-                EditorView(
-                  note: note,
-                  onDelete: {
-                    if let index = notes.firstIndex(of: note.wrappedValue) {
-                      notes.remove(at: index)
-                    }
-                  })
-              }, label: {
-                Text(note.content.wrappedValue)
-                  .lineLimit(2)
-                  .multilineTextAlignment(.leading)
-                  .foregroundColor(.primary)
-                  .padding(.vertical, 8)
-              })
+        ScrollView {
+          LazyVStack {
+            Divider()
+              .padding(.leading)
+            
+            ForEach($notes) { note in // Swift 5.5
+              HStack {
+                Button(action: {
+                  navigation.editorViewNoteId = note.wrappedValue.id
+                }, label: {
+                  Text(note.content.wrappedValue)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.leading)
+                    .foregroundColor(.primary)
+                  Spacer()
+                  Image(systemName: "chevron.right")
+                    .foregroundColor(.secondary)
+                })
+
+                // TODO: Add another button
+                Button(action: {}, label: {
+                  EmptyView()
+                })
+              }
+              .padding(.horizontal)
+              .padding(.vertical, 8)
+
+              Divider()
+                .padding(.leading)
+
+              // Hidden `NavigationLink` technique
+              NavigationLink(
+                tag: note.id.wrappedValue,
+                selection: $navigation.editorViewNoteId,
+                destination: {
+                  EditorView(
+                    note: note,
+                    onDelete: {
+                      if let index = notes.firstIndex(of: note.wrappedValue) {
+                        notes.remove(at: index)
+                      }
+                    })
+                }, label: {
+                  EmptyView()
+                })
+            }
           }
         }
-        .listStyle(PlainListStyle())
         .navigationTitle("List View")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -129,7 +168,7 @@ enum Version5 {
 
         ToolbarItem(placement: .bottomBar) {
           Button(action: {
-            navigation.wrappedValue.reset()
+            navigation.wrappedValue.dismiss()
           }, label: {
             Image(systemName: "arrowshape.turn.up.backward.fill")
           })
@@ -164,14 +203,14 @@ enum Version5 {
         .toolbar {
           ToolbarItem(placement: .bottomBar) {
             Button(action: {
-              navigation.wrappedValue.reset()
+              navigation.wrappedValue.dismiss(toRoot: true)
             }, label: {
               Image(systemName: "arrowshape.turn.up.left.2.fill")
             })
           }
           ToolbarItem(placement: .bottomBar) {
             Button(action: {
-              navigation.isPushingDisplayView.wrappedValue = false
+              navigation.wrappedValue.dismiss()
             }, label: {
               Image(systemName: "arrowshape.turn.up.backward.fill")
             })
