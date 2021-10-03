@@ -1,9 +1,13 @@
 import SwiftUI
 
+private let versionString = "Version 4"
+private typealias Navigation = Version4.Navigation
+private typealias NavigationKey = Version4.NavigationKey
+
 private extension EnvironmentValues {
-  var navigation: Binding<Version4.Navigation> {
-    get { self[Version4.NavigationKey.self] }
-    set { self[Version4.NavigationKey.self] = newValue }
+  var navigation: Binding<Navigation> {
+    get { self[NavigationKey.self] }
+    set { self[NavigationKey.self] = newValue }
   }
 }
 
@@ -69,7 +73,7 @@ enum Version4 {
             })
           }
           ToolbarItem(placement: .bottomBar) {
-            Text("Version 4")
+            Text(versionString)
           }
         }
       }
@@ -143,7 +147,7 @@ enum Version4 {
 
     // MARK: Private
 
-    @Environment(\.navigation) var navigation
+    @Environment(\.navigation) private var navigation
   }
 
   struct DisplayView: View {
@@ -185,7 +189,7 @@ enum Version4 {
 
     // MARK: Private
 
-    @Environment(\.navigation) var navigation
+    @Environment(\.navigation) private var navigation
   }
 
   struct ListView_Previews: PreviewProvider {

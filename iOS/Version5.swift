@@ -1,9 +1,22 @@
 import SwiftUI
 
-private let versionString = "Version 3"
+private let versionString = "Version 5"
+private typealias Navigation = Version5.Navigation
+private typealias NavigationKey = Version5.NavigationKey
 
-/// `Navigation` changes to value type instead of `ObservableObject`
-enum Version3 {
+private extension EnvironmentValues {
+  var navigation: Binding<Navigation> {
+    get { self[NavigationKey.self] }
+    set { self[NavigationKey.self] = newValue }
+  }
+}
+
+/// Refactor `Navigation`
+enum Version5 {
+  struct NavigationKey: EnvironmentKey {
+    static let defaultValue: Binding<Navigation> = .constant(.init())
+  }
+
   struct Navigation {
     var editorViewNoteId: UUID? {
       didSet {
@@ -12,6 +25,7 @@ enum Version3 {
         }
       }
     }
+
     var isPushingDisplayView = false
 
     mutating func reset() {
@@ -32,7 +46,6 @@ enum Version3 {
               selection: $navigation.editorViewNoteId,
               destination: {
                 EditorView(
-                  navigation: $navigation,
                   note: note,
                   onDelete: {
                     if let index = notes.firstIndex(of: note.wrappedValue) {
@@ -65,11 +78,13 @@ enum Version3 {
         }
       }
       .navigationViewStyle(StackNavigationViewStyle())
+      .environment(\.navigation, $navigation)
     }
 
     // MARK: Private
 
-    @State private var navigation = Navigation()
+    @State private var navigation: Navigation = .init()
+
     @State private var notes: [Note] = [
       .random(),
       .random(),
@@ -79,7 +94,8 @@ enum Version3 {
   }
 
   struct EditorView: View {
-    @Binding var navigation: Navigation
+    // MARK: Internal
+
     @Binding var note: Note
     var onDelete: () -> Void
 
@@ -90,10 +106,9 @@ enum Version3 {
       }
       .background(
         NavigationLink(
-          isActive: $navigation.isPushingDisplayView,
+          isActive: navigation.isPushingDisplayView,
           destination: {
             DisplayView(
-              navigation: $navigation,
               note: $note,
               onDelete: onDelete)
           },
@@ -106,7 +121,7 @@ enum Version3 {
       .toolbar {
         ToolbarItem(placement: .primaryAction) {
           Button(action: {
-            navigation.isPushingDisplayView = true
+            navigation.isPushingDisplayView.wrappedValue = true
           }, label: {
             Image(systemName: "eyes")
           })
@@ -114,7 +129,7 @@ enum Version3 {
 
         ToolbarItem(placement: .bottomBar) {
           Button(action: {
-            navigation.reset()
+            navigation.wrappedValue.reset()
           }, label: {
             Image(systemName: "arrowshape.turn.up.backward.fill")
           })
@@ -129,10 +144,15 @@ enum Version3 {
         }
       }
     }
+
+    // MARK: Private
+
+    @Environment(\.navigation) private var navigation
   }
 
   struct DisplayView: View {
-    @Binding var navigation: Navigation
+    // MARK: Internal
+
     @Binding var note: Note
     var onDelete: () -> Void
 
@@ -144,14 +164,14 @@ enum Version3 {
         .toolbar {
           ToolbarItem(placement: .bottomBar) {
             Button(action: {
-              navigation.reset()
+              navigation.wrappedValue.reset()
             }, label: {
               Image(systemName: "arrowshape.turn.up.left.2.fill")
             })
           }
           ToolbarItem(placement: .bottomBar) {
             Button(action: {
-              navigation.isPushingDisplayView = false
+              navigation.isPushingDisplayView.wrappedValue = false
             }, label: {
               Image(systemName: "arrowshape.turn.up.backward.fill")
             })
@@ -166,6 +186,10 @@ enum Version3 {
           }
         }
     }
+
+    // MARK: Private
+
+    @Environment(\.navigation) private var navigation
   }
 
   struct ListView_Previews: PreviewProvider {

@@ -1,5 +1,7 @@
 import SwiftUI
 
+private let versionString = "Version 1"
+
 /// Vanilla SwiftUI Navigation
 enum Version1 {
   struct ListView: View {
@@ -35,7 +37,7 @@ enum Version1 {
             })
           }
           ToolbarItem(placement: .bottomBar) {
-            Text("Version 1")
+            Text(versionString)
           }
         }
       }

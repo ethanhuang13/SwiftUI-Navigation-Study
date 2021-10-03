@@ -1,5 +1,7 @@
 import SwiftUI
 
+private let versionString = "Version 2"
+
 /// Use single object to manage presentation
 enum Version2 {
   class Navigation: ObservableObject {
@@ -52,7 +54,7 @@ enum Version2 {
             })
           }
           ToolbarItem(placement: .bottomBar) {
-            Text("Version 2")
+            Text(versionString)
           }
         }
       }
