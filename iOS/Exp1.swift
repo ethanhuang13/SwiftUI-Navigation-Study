@@ -15,15 +15,12 @@ enum Exp1 {
       NavigationView {
         List {
           ForEach($notes) { note in // Swift 5.5
-            NavigationLink(
-              destination:
+            NavigationLink(destination:
               EditorView(note: note, onDelete: {
                 if let index = notes.firstIndex(of: note.wrappedValue) {
                   notes.remove(at: index)
                 }
-              }),
-              tag: note.id.wrappedValue,
-              selection: $selection) {
+              })) {
                 Text(note.content.wrappedValue)
                   .lineLimit(2)
                   .multilineTextAlignment(.leading)
@@ -35,7 +32,6 @@ enum Exp1 {
         .listStyle(PlainListStyle())
         .navigationTitle("List View (Exp1)")
         .navigationBarTitleDisplayMode(.inline)
-        .navigationViewStyle(StackNavigationViewStyle())
         .toolbar {
           ToolbarItem(placement: .primaryAction) {
             Button(action: {
@@ -46,6 +42,7 @@ enum Exp1 {
           }
         }
       }
+      .navigationViewStyle(StackNavigationViewStyle())
     }
 
     // MARK: Private
@@ -56,8 +53,6 @@ enum Exp1 {
       .random(),
       .random()
     ]
-
-    @State private var selection: UUID?
   }
 
   struct EditorView: View {
@@ -114,12 +109,10 @@ enum Exp1 {
   }
 
   struct DisplayView: View {
+    // MARK: Internal
+
     @Binding var note: Note
     var onDelete: () -> Void
-
-    // iOS 15 way
-    // `DismissAction`: `CallAsFunction`
-    @Environment(\.dismiss) var dismiss
 
     var body: some View {
       Text(String(note.content))
@@ -136,7 +129,7 @@ enum Exp1 {
           ToolbarItem(placement: .bottomBar) {
             Button(action: {
               // Pop to `NoteView`
-              dismiss()
+              presentationMode.wrappedValue.dismiss()
             }, label: {
               Image(systemName: "arrowshape.turn.up.backward.fill")
             })
@@ -151,6 +144,10 @@ enum Exp1 {
           }
         }
     }
+
+    // MARK: Private
+
+    @Environment(\.presentationMode) private var presentationMode
   }
 
   struct ListView_Previews: PreviewProvider {

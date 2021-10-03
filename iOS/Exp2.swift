@@ -8,34 +8,47 @@
 import SwiftUI
 
 enum Exp2 {
+  class Navigation: ObservableObject {
+    @Published var editorViewNoteId: UUID?
+    @Published var isPushingDisplayView = false
+
+    func reset() {
+      editorViewNoteId = nil
+      isPushingDisplayView = false
+    }
+  }
+
   struct ListView: View {
     // MARK: Internal
-    
+
     var body: some View {
       NavigationView {
         List {
           ForEach($notes) { note in // Swift 5.5
             NavigationLink(
-              destination:
-                EditorView(note: note, onDelete: {
-                  if let index = notes.firstIndex(of: note.wrappedValue) {
-                    notes.remove(at: index)
-                  }
-                }),
               tag: note.id.wrappedValue,
-              selection: $selection) {
+              selection: $navigation.editorViewNoteId,
+              destination: {
+                EditorView(
+                  navigation: navigation,
+                  note: note,
+                  onDelete: {
+                    if let index = notes.firstIndex(of: note.wrappedValue) {
+                      notes.remove(at: index)
+                    }
+                  })
+              }, label: {
                 Text(note.content.wrappedValue)
                   .lineLimit(2)
                   .multilineTextAlignment(.leading)
                   .foregroundColor(.primary)
                   .padding(.vertical, 8)
-              }
+              })
           }
         }
         .listStyle(PlainListStyle())
         .navigationTitle("List View (Exp2)")
         .navigationBarTitleDisplayMode(.inline)
-        .navigationViewStyle(StackNavigationViewStyle())
         .toolbar {
           ToolbarItem(placement: .primaryAction) {
             Button(action: {
@@ -46,26 +59,25 @@ enum Exp2 {
           }
         }
       }
+      .navigationViewStyle(StackNavigationViewStyle())
     }
-    
+
     // MARK: Private
-    
+
+    @StateObject private var navigation = Navigation()
     @State private var notes: [Note] = [
       .random(),
       .random(),
       .random(),
       .random()
     ]
-    
-    @State private var selection: UUID?
   }
-  
+
   struct EditorView: View {
-    // MARK: Internal
-    
+    @StateObject var navigation: Navigation
     @Binding var note: Note
     var onDelete: () -> Void
-    
+
     var body: some View {
       VStack {
         TextEditor(text: $note.content)
@@ -73,24 +85,31 @@ enum Exp2 {
       }
       .background(
         NavigationLink(
-          isActive: $isPushingDisplayView,
-          destination: { DisplayView(note: $note, onDelete: onDelete) },
-          label: { EmptyView() })
+          isActive: $navigation.isPushingDisplayView,
+          destination: {
+            DisplayView(
+              navigation: navigation,
+              note: $note,
+              onDelete: onDelete)
+          },
+          label: {
+            EmptyView()
+          })
       )
       .navigationTitle("Editor View")
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
         ToolbarItem(placement: .primaryAction) {
           Button(action: {
-            isPushingDisplayView = true
+            navigation.isPushingDisplayView = true
           }, label: {
             Image(systemName: "eyes")
           })
         }
-        
+
         ToolbarItem(placement: .bottomBar) {
           Button(action: {
-            presentationMode.wrappedValue.dismiss()
+            navigation.reset()
           }, label: {
             Image(systemName: "arrowshape.turn.up.backward.fill")
           })
@@ -105,22 +124,13 @@ enum Exp2 {
         }
       }
     }
-    
-    // MARK: Private
-    
-    @Environment(\.presentationMode) private var presentationMode
-    
-    @State private var isPushingDisplayView = false
   }
-  
+
   struct DisplayView: View {
+    @StateObject var navigation: Navigation
     @Binding var note: Note
     var onDelete: () -> Void
-    
-    // iOS 15 way
-    // `DismissAction`: `CallAsFunction`
-    @Environment(\.dismiss) var dismiss
-    
+
     var body: some View {
       Text(String(note.content))
         .font(.largeTitle)
@@ -128,15 +138,15 @@ enum Exp2 {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
           ToolbarItem(placement: .bottomBar) {
-            Button(action: {}, label: {
+            Button(action: {
+              navigation.reset()
+            }, label: {
               Image(systemName: "arrowshape.turn.up.left.2.fill")
             })
-              .disabled(true)
           }
           ToolbarItem(placement: .bottomBar) {
             Button(action: {
-              // Pop to `NoteView`
-              dismiss()
+              navigation.isPushingDisplayView = false
             }, label: {
               Image(systemName: "arrowshape.turn.up.backward.fill")
             })
@@ -152,7 +162,7 @@ enum Exp2 {
         }
     }
   }
-  
+
   struct ListView_Previews: PreviewProvider {
     static var previews: some View {
       ListView()
