@@ -1,12 +1,6 @@
-//
-//  NavState.swift
-//  Nav (iOS)
-//
-//  Created by Ethan Huang on 2021/10/3.
-//
-
 import SwiftUI
 
+/// Vanilla SwiftUI Navigation
 enum Version1 {
   struct ListView: View {
     // MARK: Internal

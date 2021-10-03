@@ -1,12 +1,18 @@
 import SwiftUI
 
-/// Use single object to manage presentation
-enum Version2 {
-  class Navigation: ObservableObject {
-    @Published var editorViewNoteId: UUID?
-    @Published var isPushingDisplayView = false
+/// `Navigation` changes to value type instead of `ObservableObject`
+enum Version3 {
+  struct Navigation {
+    var editorViewNoteId: UUID? {
+      didSet {
+        if editorViewNoteId == nil {
+          isPushingDisplayView = false
+        }
+      }
+    }
+    var isPushingDisplayView = false
 
-    func reset() {
+    mutating func reset() {
       editorViewNoteId = nil
       isPushingDisplayView = false
     }
@@ -24,7 +30,7 @@ enum Version2 {
               selection: $navigation.editorViewNoteId,
               destination: {
                 EditorView(
-                  navigation: navigation,
+                  navigation: $navigation,
                   note: note,
                   onDelete: {
                     if let index = notes.firstIndex(of: note.wrappedValue) {
@@ -52,7 +58,7 @@ enum Version2 {
             })
           }
           ToolbarItem(placement: .bottomBar) {
-            Text("Version 2")
+            Text("Version 3")
           }
         }
       }
@@ -61,7 +67,7 @@ enum Version2 {
 
     // MARK: Private
 
-    @StateObject private var navigation = Navigation()
+    @State private var navigation = Navigation()
     @State private var notes: [Note] = [
       .random(),
       .random(),
@@ -71,7 +77,7 @@ enum Version2 {
   }
 
   struct EditorView: View {
-    @StateObject var navigation: Navigation
+    @Binding var navigation: Navigation
     @Binding var note: Note
     var onDelete: () -> Void
 
@@ -85,7 +91,7 @@ enum Version2 {
           isActive: $navigation.isPushingDisplayView,
           destination: {
             DisplayView(
-              navigation: navigation,
+              navigation: $navigation,
               note: $note,
               onDelete: onDelete)
           },
@@ -124,7 +130,7 @@ enum Version2 {
   }
 
   struct DisplayView: View {
-    @StateObject var navigation: Navigation
+    @Binding var navigation: Navigation
     @Binding var note: Note
     var onDelete: () -> Void
 
