@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-      Version6.ListView()
+      Version6.ContainerView()
     }
 }
 

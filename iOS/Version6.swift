@@ -17,104 +17,40 @@ enum Version6 {
     static let defaultValue: Binding<Navigation> = .constant(.init())
   }
 
+  enum Screen {
+    case list, editor(UUID), display(UUID)
+  }
+
   struct Navigation {
-    var editorViewNoteId: UUID? {
-      didSet {
-        if editorViewNoteId == nil {
-          isPushingDisplayView = false
-        }
-      }
+    private(set) var screens: [Screen] = [.list]
+
+    mutating func pushEditorView(noteId: UUID) {
+      screens.append(.editor(noteId))
     }
 
-    var isPushingDisplayView = false
+    mutating func pushDisplayView(noteId: UUID) {
+      screens.append(.display(noteId))
+    }
 
     mutating func dismiss(toRoot: Bool = false) {
+      guard screens.count > 1 else {
+        return
+      }
+
       if toRoot {
-        editorViewNoteId = nil
-        isPushingDisplayView = false
-        return
-      }
-
-      guard editorViewNoteId != nil else {
-        // already in root
-        return
-      }
-
-      if isPushingDisplayView {
-        isPushingDisplayView = false
+        screens = screens.dropLast(screens.count - 1)
       } else {
-        editorViewNoteId = nil
+        screens.removeLast()
       }
     }
   }
 
-  struct ListView: View {
+  struct ContainerView: View {
     // MARK: Internal
 
     var body: some View {
       NavigationView {
-        ScrollView {
-          LazyVStack {
-            Divider()
-              .padding(.leading)
-            
-            ForEach($notes) { note in // Swift 5.5
-              HStack {
-                Button(action: {
-                  navigation.editorViewNoteId = note.wrappedValue.id
-                }, label: {
-                  Text(note.content.wrappedValue)
-                    .lineLimit(2)
-                    .multilineTextAlignment(.leading)
-                    .foregroundColor(.primary)
-                  Spacer()
-                  Image(systemName: "chevron.right")
-                    .foregroundColor(.secondary)
-                })
-
-                // TODO: Add another button
-                Button(action: {}, label: {
-                  EmptyView()
-                })
-              }
-              .padding(.horizontal)
-              .padding(.vertical, 8)
-
-              Divider()
-                .padding(.leading)
-
-              // Hidden `NavigationLink` technique
-              NavigationLink(
-                tag: note.id.wrappedValue,
-                selection: $navigation.editorViewNoteId,
-                destination: {
-                  EditorView(
-                    note: note,
-                    onDelete: {
-                      if let index = notes.firstIndex(of: note.wrappedValue) {
-                        notes.remove(at: index)
-                      }
-                    })
-                }, label: {
-                  EmptyView()
-                })
-            }
-          }
-        }
-        .navigationTitle("List View")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-          ToolbarItem(placement: .primaryAction) {
-            Button(action: {
-              notes.append(.random())
-            }, label: {
-              Image(systemName: "plus")
-            })
-          }
-          ToolbarItem(placement: .bottomBar) {
-            Text(versionString)
-          }
-        }
+        buildCurrentView()
       }
       .navigationViewStyle(StackNavigationViewStyle())
       .environment(\.navigation, $navigation)
@@ -123,13 +59,121 @@ enum Version6 {
     // MARK: Private
 
     @State private var navigation: Navigation = .init()
-
     @State private var notes: [Note] = [
       .random(),
       .random(),
       .random(),
       .random()
     ]
+
+    @ViewBuilder
+    private func buildCurrentView() -> some View {
+      if let screen = navigation.screens.last {
+        buildView(for: screen)
+      }
+    }
+
+    @ViewBuilder
+    private func buildView(for screen: Screen) -> some View {
+      switch screen {
+      case .list:
+        ListView(notes: $notes)
+      case .editor(let noteId):
+        if let note = bindingCurrentNote(noteId) {
+          EditorView(note: note, onDelete: { deleteNote(noteId) })
+        } else {
+          Text("Build `EditorView` failed")
+        }
+      case .display(let noteId):
+        if let note = bindingCurrentNote(noteId) {
+          DisplayView(note: note, onDelete: { deleteNote(noteId) })
+        } else {
+          Text("Build `DisplayView` failed")
+        }
+      }
+    }
+
+    private func bindingCurrentNote(_ noteId: UUID) -> Binding<Note>? {
+      guard notes.map(\.id).contains(noteId) else {
+        return nil
+      }
+      return Binding(get: {
+        notes.first(where: { $0.id == noteId })!
+      }, set: { note, _ in
+        if let index = notes.firstIndex(where: { $0.id == noteId }) {
+          notes.replaceSubrange(index ... index, with: [note])
+        }
+      })
+    }
+
+    private func deleteNote(_ noteId: UUID) {
+      if let index = notes.firstIndex(where: { $0.id == noteId }) {
+        notes.remove(at: index)
+        $navigation.wrappedValue.dismiss(toRoot: true)
+      }
+    }
+  }
+
+  struct ListView: View {
+    // MARK: Internal
+
+    @Binding var notes: [Note]
+
+    var body: some View {
+      ScrollView {
+        LazyVStack {
+          Divider()
+            .padding(.leading)
+
+          ForEach($notes) { note in // Swift 5.5
+            HStack {
+              Button(action: {
+                navigation.wrappedValue.pushEditorView(noteId: note.wrappedValue.id)
+              }, label: {
+                Text(note.content.wrappedValue)
+                  .lineLimit(2)
+                  .multilineTextAlignment(.leading)
+                  .foregroundColor(.primary)
+              })
+
+              Spacer()
+
+              Button(action: {
+                navigation.wrappedValue.pushDisplayView(noteId: note.wrappedValue.id)
+              }, label: {
+                Image(systemName: "eyes")
+              })
+
+              Image(systemName: "chevron.right")
+                .foregroundColor(.secondary)
+            }
+            .padding(.horizontal)
+            .padding(.vertical, 8)
+
+            Divider()
+              .padding(.leading)
+          }
+        }
+      }
+      .navigationTitle("List View")
+      .navigationBarTitleDisplayMode(.inline)
+      .toolbar {
+        ToolbarItem(placement: .primaryAction) {
+          Button(action: {
+            notes.append(.random())
+          }, label: {
+            Image(systemName: "plus")
+          })
+        }
+        ToolbarItem(placement: .bottomBar) {
+          Text(versionString)
+        }
+      }
+    }
+
+    // MARK: Private
+
+    @Environment(\.navigation) private var navigation
   }
 
   struct EditorView: View {
@@ -143,24 +187,12 @@ enum Version6 {
         TextEditor(text: $note.content)
           .padding()
       }
-      .background(
-        NavigationLink(
-          isActive: navigation.isPushingDisplayView,
-          destination: {
-            DisplayView(
-              note: $note,
-              onDelete: onDelete)
-          },
-          label: {
-            EmptyView()
-          })
-      )
       .navigationTitle("Editor View")
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
         ToolbarItem(placement: .primaryAction) {
           Button(action: {
-            navigation.isPushingDisplayView.wrappedValue = true
+            navigation.wrappedValue.pushDisplayView(noteId: $note.wrappedValue.id)
           }, label: {
             Image(systemName: "eyes")
           })
@@ -233,7 +265,7 @@ enum Version6 {
 
   struct ListView_Previews: PreviewProvider {
     static var previews: some View {
-      ListView()
+      ContainerView()
     }
   }
 }
