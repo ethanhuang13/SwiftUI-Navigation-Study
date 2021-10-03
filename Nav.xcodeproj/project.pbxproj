@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		6C4992CE270A090400A3A409 /* Version3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C4992CD270A090400A3A409 /* Version3.swift */; };
+		6C4992D0270A0BDC00A3A409 /* Version4.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C4992CF270A0BDC00A3A409 /* Version4.swift */; };
 		6C9C85332709C2F9002A692F /* Version2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9C85322709C2F9002A692F /* Version2.swift */; };
 		6C9C85352709C363002A692F /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9C85342709C363002A692F /* Note.swift */; };
 		6CF6D9012709A3C10073EE55 /* NavApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CF6D8F12709A3BF0073EE55 /* NavApp.swift */; };
@@ -21,6 +22,7 @@
 
 /* Begin PBXFileReference section */
 		6C4992CD270A090400A3A409 /* Version3.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Version3.swift; sourceTree = "<group>"; };
+		6C4992CF270A0BDC00A3A409 /* Version4.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Version4.swift; sourceTree = "<group>"; };
 		6C9C85322709C2F9002A692F /* Version2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Version2.swift; sourceTree = "<group>"; };
 		6C9C85342709C363002A692F /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
 		6CF6D8F12709A3BF0073EE55 /* NavApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavApp.swift; sourceTree = "<group>"; };
@@ -96,6 +98,7 @@
 				6CF6D9102709A3EF0073EE55 /* Version1.swift */,
 				6C9C85322709C2F9002A692F /* Version2.swift */,
 				6C4992CD270A090400A3A409 /* Version3.swift */,
+				6C4992CF270A0BDC00A3A409 /* Version4.swift */,
 			);
 			path = iOS;
 			sourceTree = "<group>";
@@ -200,6 +203,7 @@
 			files = (
 				6C9C85352709C363002A692F /* Note.swift in Sources */,
 				6C9C85332709C2F9002A692F /* Version2.swift in Sources */,
+				6C4992D0270A0BDC00A3A409 /* Version4.swift in Sources */,
 				6CF6D9032709A3C10073EE55 /* ContentView.swift in Sources */,
 				6CF6D9012709A3C10073EE55 /* NavApp.swift in Sources */,
 				6C4992CE270A090400A3A409 /* Version3.swift in Sources */,
