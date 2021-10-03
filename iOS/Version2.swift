@@ -7,7 +7,17 @@
 
 import SwiftUI
 
-enum Exp1 {
+enum Version2 {
+  class Navigation: ObservableObject {
+    @Published var editorViewNoteId: UUID?
+    @Published var isPushingDisplayView = false
+
+    func reset() {
+      editorViewNoteId = nil
+      isPushingDisplayView = false
+    }
+  }
+
   struct ListView: View {
     // MARK: Internal
 
@@ -15,18 +25,25 @@ enum Exp1 {
       NavigationView {
         List {
           ForEach($notes) { note in // Swift 5.5
-            NavigationLink(destination:
-              EditorView(note: note, onDelete: {
-                if let index = notes.firstIndex(of: note.wrappedValue) {
-                  notes.remove(at: index)
-                }
-              })) {
+            NavigationLink(
+              tag: note.id.wrappedValue,
+              selection: $navigation.editorViewNoteId,
+              destination: {
+                EditorView(
+                  navigation: navigation,
+                  note: note,
+                  onDelete: {
+                    if let index = notes.firstIndex(of: note.wrappedValue) {
+                      notes.remove(at: index)
+                    }
+                  })
+              }, label: {
                 Text(note.content.wrappedValue)
                   .lineLimit(2)
                   .multilineTextAlignment(.leading)
                   .foregroundColor(.primary)
                   .padding(.vertical, 8)
-            }
+              })
           }
         }
         .listStyle(PlainListStyle())
@@ -41,7 +58,7 @@ enum Exp1 {
             })
           }
           ToolbarItem(placement: .bottomBar) {
-            Text("Exp 2")
+            Text("Version 2")
           }
         }
       }
@@ -50,6 +67,7 @@ enum Exp1 {
 
     // MARK: Private
 
+    @StateObject private var navigation = Navigation()
     @State private var notes: [Note] = [
       .random(),
       .random(),
@@ -59,8 +77,7 @@ enum Exp1 {
   }
 
   struct EditorView: View {
-    // MARK: Internal
-
+    @StateObject var navigation: Navigation
     @Binding var note: Note
     var onDelete: () -> Void
 
@@ -71,16 +88,23 @@ enum Exp1 {
       }
       .background(
         NavigationLink(
-          isActive: $isPushingDisplayView,
-          destination: { DisplayView(note: $note, onDelete: onDelete) },
-          label: { EmptyView() })
+          isActive: $navigation.isPushingDisplayView,
+          destination: {
+            DisplayView(
+              navigation: navigation,
+              note: $note,
+              onDelete: onDelete)
+          },
+          label: {
+            EmptyView()
+          })
       )
       .navigationTitle("Editor View")
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
         ToolbarItem(placement: .primaryAction) {
           Button(action: {
-            isPushingDisplayView = true
+            navigation.isPushingDisplayView = true
           }, label: {
             Image(systemName: "eyes")
           })
@@ -88,7 +112,7 @@ enum Exp1 {
 
         ToolbarItem(placement: .bottomBar) {
           Button(action: {
-            presentationMode.wrappedValue.dismiss()
+            navigation.reset()
           }, label: {
             Image(systemName: "arrowshape.turn.up.backward.fill")
           })
@@ -103,17 +127,10 @@ enum Exp1 {
         }
       }
     }
-
-    // MARK: Private
-
-    @Environment(\.presentationMode) private var presentationMode
-
-    @State private var isPushingDisplayView = false
   }
 
   struct DisplayView: View {
-    // MARK: Internal
-
+    @StateObject var navigation: Navigation
     @Binding var note: Note
     var onDelete: () -> Void
 
@@ -124,15 +141,15 @@ enum Exp1 {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
           ToolbarItem(placement: .bottomBar) {
-            Button(action: {}, label: {
+            Button(action: {
+              navigation.reset()
+            }, label: {
               Image(systemName: "arrowshape.turn.up.left.2.fill")
             })
-              .disabled(true)
           }
           ToolbarItem(placement: .bottomBar) {
             Button(action: {
-              // Pop to `NoteView`
-              presentationMode.wrappedValue.dismiss()
+              navigation.isPushingDisplayView = false
             }, label: {
               Image(systemName: "arrowshape.turn.up.backward.fill")
             })
@@ -147,10 +164,6 @@ enum Exp1 {
           }
         }
     }
-
-    // MARK: Private
-
-    @Environment(\.presentationMode) private var presentationMode
   }
 
   struct ListView_Previews: PreviewProvider {
