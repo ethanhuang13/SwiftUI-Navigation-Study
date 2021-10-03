@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6C9C85332709C2F9002A692F /* Exp2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9C85322709C2F9002A692F /* Exp2.swift */; };
+		6C9C85352709C363002A692F /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9C85342709C363002A692F /* Note.swift */; };
 		6CF6D9012709A3C10073EE55 /* NavApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CF6D8F12709A3BF0073EE55 /* NavApp.swift */; };
 		6CF6D9022709A3C10073EE55 /* NavApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CF6D8F12709A3BF0073EE55 /* NavApp.swift */; };
 		6CF6D9032709A3C10073EE55 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CF6D8F22709A3BF0073EE55 /* ContentView.swift */; };
@@ -17,6 +19,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		6C9C85322709C2F9002A692F /* Exp2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Exp2.swift; sourceTree = "<group>"; };
+		6C9C85342709C363002A692F /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
 		6CF6D8F12709A3BF0073EE55 /* NavApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavApp.swift; sourceTree = "<group>"; };
 		6CF6D8F22709A3BF0073EE55 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		6CF6D8F32709A3C10073EE55 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -60,6 +64,7 @@
 			isa = PBXGroup;
 			children = (
 				6CF6D8F12709A3BF0073EE55 /* NavApp.swift */,
+				6C9C85342709C363002A692F /* Note.swift */,
 				6CF6D8F22709A3BF0073EE55 /* ContentView.swift */,
 				6CF6D8F32709A3C10073EE55 /* Assets.xcassets */,
 			);
@@ -87,6 +92,7 @@
 			isa = PBXGroup;
 			children = (
 				6CF6D9102709A3EF0073EE55 /* Exp1.swift */,
+				6C9C85322709C2F9002A692F /* Exp2.swift */,
 			);
 			path = iOS;
 			sourceTree = "<group>";
@@ -189,6 +195,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6C9C85352709C363002A692F /* Note.swift in Sources */,
+				6C9C85332709C2F9002A692F /* Exp2.swift in Sources */,
 				6CF6D9032709A3C10073EE55 /* ContentView.swift in Sources */,
 				6CF6D9012709A3C10073EE55 /* NavApp.swift in Sources */,
 				6CF6D9112709A3EF0073EE55 /* Exp1.swift in Sources */,

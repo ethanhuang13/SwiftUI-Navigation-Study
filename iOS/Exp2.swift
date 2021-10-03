@@ -7,21 +7,21 @@
 
 import SwiftUI
 
-enum Exp1 {
+enum Exp2 {
   struct ListView: View {
     // MARK: Internal
-
+    
     var body: some View {
       NavigationView {
         List {
           ForEach($notes) { note in // Swift 5.5
             NavigationLink(
               destination:
-              EditorView(note: note, onDelete: {
-                if let index = notes.firstIndex(of: note.wrappedValue) {
-                  notes.remove(at: index)
-                }
-              }),
+                EditorView(note: note, onDelete: {
+                  if let index = notes.firstIndex(of: note.wrappedValue) {
+                    notes.remove(at: index)
+                  }
+                }),
               tag: note.id.wrappedValue,
               selection: $selection) {
                 Text(note.content.wrappedValue)
@@ -29,11 +29,11 @@ enum Exp1 {
                   .multilineTextAlignment(.leading)
                   .foregroundColor(.primary)
                   .padding(.vertical, 8)
-            }
+              }
           }
         }
         .listStyle(PlainListStyle())
-        .navigationTitle("List View (Exp1)")
+        .navigationTitle("List View (Exp2)")
         .navigationBarTitleDisplayMode(.inline)
         .navigationViewStyle(StackNavigationViewStyle())
         .toolbar {
@@ -47,25 +47,25 @@ enum Exp1 {
         }
       }
     }
-
+    
     // MARK: Private
-
+    
     @State private var notes: [Note] = [
       .random(),
       .random(),
       .random(),
       .random()
     ]
-
+    
     @State private var selection: UUID?
   }
-
+  
   struct EditorView: View {
     // MARK: Internal
-
+    
     @Binding var note: Note
     var onDelete: () -> Void
-
+    
     var body: some View {
       VStack {
         TextEditor(text: $note.content)
@@ -87,7 +87,7 @@ enum Exp1 {
             Image(systemName: "eyes")
           })
         }
-
+        
         ToolbarItem(placement: .bottomBar) {
           Button(action: {
             presentationMode.wrappedValue.dismiss()
@@ -105,22 +105,22 @@ enum Exp1 {
         }
       }
     }
-
+    
     // MARK: Private
-
+    
     @Environment(\.presentationMode) private var presentationMode
-
+    
     @State private var isPushingDisplayView = false
   }
-
+  
   struct DisplayView: View {
     @Binding var note: Note
     var onDelete: () -> Void
-
+    
     // iOS 15 way
     // `DismissAction`: `CallAsFunction`
     @Environment(\.dismiss) var dismiss
-
+    
     var body: some View {
       Text(String(note.content))
         .font(.largeTitle)
@@ -152,7 +152,7 @@ enum Exp1 {
         }
     }
   }
-
+  
   struct ListView_Previews: PreviewProvider {
     static var previews: some View {
       ListView()
