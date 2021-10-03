@@ -30,7 +30,7 @@ enum Exp1 {
           }
         }
         .listStyle(PlainListStyle())
-        .navigationTitle("List View (Exp1)")
+        .navigationTitle("List View")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
           ToolbarItem(placement: .primaryAction) {
@@ -39,6 +39,9 @@ enum Exp1 {
             }, label: {
               Image(systemName: "plus")
             })
+          }
+          ToolbarItem(placement: .bottomBar) {
+            Text("Exp 2")
           }
         }
       }
