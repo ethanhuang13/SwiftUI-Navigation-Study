@@ -11,10 +11,11 @@ private extension EnvironmentValues {
   }
 }
 
-/// Refactor `Navigation` and `ListView`
+/// Put `NavigationLink` back. With `NavigationNode`, `NavigationStack`, and `ScreenView`
+/// Reference: https://github.com/johnpatrickmorgan/FlowStacks/
 enum Version7 {
   struct NavigationKey: EnvironmentKey {
-    static let defaultValue: Binding<Navigation> = .constant(.init())
+    static let defaultValue: Binding<Navigation> = .constant(.init(screens: [.list]))
   }
 
   enum Screen {
@@ -22,7 +23,7 @@ enum Version7 {
   }
 
   struct Navigation {
-    private(set) var screens: [Screen] = [.list]
+    var screens: [Screen]
 
     mutating func pushEditorView(noteId: UUID) {
       screens.append(.editor(noteId))
@@ -45,12 +46,134 @@ enum Version7 {
     }
   }
 
+  indirect enum NavigationNode: View {
+    case view(ScreenView,
+              nextNode: NavigationNode,
+              screens: Binding<[Screen]>,
+              index: Int)
+    case nothing
+
+    // MARK: Internal
+
+    var body: some View {
+      screenView
+        .background(
+          NavigationLink(
+            isActive: isActive,
+            destination: { pushingScreenView },
+            label: { EmptyView() })
+        )
+    }
+
+    // MARK: Private
+
+    private var isActive: Binding<Bool> {
+      switch self {
+      case let .view(_, nextNode: .view, screens: screens, index: index):
+        let countIfNotActive = index + 1
+        return Binding(
+          get: {
+            screens.wrappedValue.count > countIfNotActive
+          },
+          set: { isActive in
+            guard isActive == false,
+                  screens.wrappedValue.count > countIfNotActive else {
+              return
+            }
+            screens.wrappedValue = Array(screens.wrappedValue.prefix(countIfNotActive))
+          })
+      default:
+        return .constant(false)
+      }
+    }
+
+    @ViewBuilder
+    private var screenView: some View {
+      if case let .view(view, _, _, _) = self {
+        view
+      }
+    }
+
+    @ViewBuilder
+    private var pushingScreenView: some View {
+      if case let .view(_, navigationNode, _, _) = self {
+        navigationNode
+      }
+    }
+  }
+
+  struct NavigationStack: View {
+    @Binding var screens: [Screen]
+    @ViewBuilder var buildView: (Screen) -> ScreenView
+
+    var body: some View {
+      screens // [.list, .editor, .display]
+        .enumerated()
+        .reversed() // [.display, .editor, .list]
+        .reduce(NavigationNode.nothing) { result, next in
+          // [.nothing, .display, .editor, .list]
+          NavigationNode.view(
+            buildView(next.element),
+            nextNode: result,
+            screens: $screens,
+            index: next.offset)
+        }
+    }
+  }
+
+  struct ScreenView: View {
+    // MARK: Internal
+
+    let screen: Screen
+    @Binding var notes: [Note]
+
+    var body: some View {
+      switch screen {
+      case .list:
+        ListView(notes: $notes)
+      case let .editor(noteId):
+        if let note = bindingCurrentNote(noteId) {
+          EditorView(note: note, onDelete: { deleteNote(noteId) })
+        }
+      case let .display(noteId):
+        if let note = bindingCurrentNote(noteId) {
+          DisplayView(note: note, onDelete: { deleteNote(noteId) })
+        }
+      }
+    }
+
+    // MARK: Private
+
+    private func bindingCurrentNote(_ noteId: UUID) -> Binding<Note>? {
+      guard let note = notes.first(where: { $0.id == noteId }) else {
+        return nil
+      }
+      return Binding(
+        get: {
+          note
+        },
+        set: { note, _ in
+          if let index = notes.firstIndex(where: { $0.id == noteId }) {
+            notes.replaceSubrange(index ... index, with: [note])
+          }
+        })
+    }
+
+    private func deleteNote(_ noteId: UUID) {
+      if let index = notes.firstIndex(where: { $0.id == noteId }) {
+        notes.remove(at: index)
+      }
+    }
+  }
+
   struct ContainerView: View {
     // MARK: Internal
 
     var body: some View {
       NavigationView {
-        buildCurrentView()
+        NavigationStack(screens: $navigation.screens) { screen in
+          ScreenView(screen: screen, notes: $notes)
+        }
       }
       .navigationViewStyle(StackNavigationViewStyle())
       .environment(\.navigation, $navigation)
@@ -58,60 +181,13 @@ enum Version7 {
 
     // MARK: Private
 
-    @State private var navigation: Navigation = .init()
+    @State private var navigation = Navigation(screens: [.list])
     @State private var notes: [Note] = [
       .random(),
       .random(),
       .random(),
       .random()
     ]
-
-    @ViewBuilder
-    private func buildCurrentView() -> some View {
-      if let screen = navigation.screens.last {
-        buildView(for: screen)
-      }
-    }
-
-    @ViewBuilder
-    private func buildView(for screen: Screen) -> some View {
-      switch screen {
-      case .list:
-        ListView(notes: $notes)
-      case .editor(let noteId):
-        if let note = bindingCurrentNote(noteId) {
-          EditorView(note: note, onDelete: { deleteNote(noteId) })
-        } else {
-          Text("Build `EditorView` failed")
-        }
-      case .display(let noteId):
-        if let note = bindingCurrentNote(noteId) {
-          DisplayView(note: note, onDelete: { deleteNote(noteId) })
-        } else {
-          Text("Build `DisplayView` failed")
-        }
-      }
-    }
-
-    private func bindingCurrentNote(_ noteId: UUID) -> Binding<Note>? {
-      guard notes.map(\.id).contains(noteId) else {
-        return nil
-      }
-      return Binding(get: {
-        notes.first(where: { $0.id == noteId })!
-      }, set: { note, _ in
-        if let index = notes.firstIndex(where: { $0.id == noteId }) {
-          notes.replaceSubrange(index ... index, with: [note])
-        }
-      })
-    }
-
-    private func deleteNote(_ noteId: UUID) {
-      if let index = notes.firstIndex(where: { $0.id == noteId }) {
-        notes.remove(at: index)
-        $navigation.wrappedValue.dismiss(toRoot: true)
-      }
-    }
   }
 
   struct ListView: View {
@@ -208,6 +284,7 @@ enum Version7 {
         ToolbarItem(placement: .destructiveAction) {
           Button(action: {
             onDelete()
+            navigation.wrappedValue.dismiss(toRoot: true)
           }, label: {
             Image(systemName: "trash")
               .foregroundColor(.red)
@@ -250,6 +327,7 @@ enum Version7 {
           ToolbarItem(placement: .destructiveAction) {
             Button(action: {
               onDelete()
+              navigation.wrappedValue.dismiss(toRoot: true)
             }, label: {
               Image(systemName: "trash")
                 .foregroundColor(.red)

@@ -14,7 +14,7 @@ private extension EnvironmentValues {
 /// Refactor `Navigation` and `ListView`
 enum Version6 {
   struct NavigationKey: EnvironmentKey {
-    static let defaultValue: Binding<Navigation> = .constant(.init())
+    static let defaultValue: Binding<Navigation> = .constant(.init(screens: [.list]))
   }
 
   enum Screen {
@@ -22,7 +22,7 @@ enum Version6 {
   }
 
   struct Navigation {
-    private(set) var screens: [Screen] = [.list]
+    var screens: [Screen]
 
     mutating func pushEditorView(noteId: UUID) {
       screens.append(.editor(noteId))
@@ -58,7 +58,7 @@ enum Version6 {
 
     // MARK: Private
 
-    @State private var navigation: Navigation = .init()
+    @State private var navigation = Navigation(screens: [.list])
     @State private var notes: [Note] = [
       .random(),
       .random(),
@@ -78,13 +78,13 @@ enum Version6 {
       switch screen {
       case .list:
         ListView(notes: $notes)
-      case .editor(let noteId):
+      case let .editor(noteId):
         if let note = bindingCurrentNote(noteId) {
           EditorView(note: note, onDelete: { deleteNote(noteId) })
         } else {
           Text("Build `EditorView` failed")
         }
-      case .display(let noteId):
+      case let .display(noteId):
         if let note = bindingCurrentNote(noteId) {
           DisplayView(note: note, onDelete: { deleteNote(noteId) })
         } else {
@@ -94,16 +94,18 @@ enum Version6 {
     }
 
     private func bindingCurrentNote(_ noteId: UUID) -> Binding<Note>? {
-      guard notes.map(\.id).contains(noteId) else {
+      guard let note = notes.first(where: { $0.id == noteId }) else {
         return nil
       }
-      return Binding(get: {
-        notes.first(where: { $0.id == noteId })!
-      }, set: { note, _ in
-        if let index = notes.firstIndex(where: { $0.id == noteId }) {
-          notes.replaceSubrange(index ... index, with: [note])
-        }
-      })
+      return Binding(
+        get: {
+          note
+        },
+        set: { note, _ in
+          if let index = notes.firstIndex(where: { $0.id == noteId }) {
+            notes.replaceSubrange(index ... index, with: [note])
+          }
+        })
     }
 
     private func deleteNote(_ noteId: UUID) {

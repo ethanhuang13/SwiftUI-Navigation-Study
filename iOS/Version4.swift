@@ -83,7 +83,7 @@ enum Version4 {
 
     // MARK: Private
 
-    @State private var navigation: Navigation = .init()
+    @State private var navigation = Navigation()
 
     @State private var notes: [Note] = [
       .random(),
