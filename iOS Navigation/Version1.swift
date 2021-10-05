@@ -5,7 +5,12 @@ private let versionString = "Version 1"
 /// Vanilla SwiftUI Navigation
 enum Version1 {
   struct ListView: View {
-    // MARK: Internal
+    @State private var notes: [Note] = [
+      .random(),
+      .random(),
+      .random(),
+      .random()
+    ]
 
     var body: some View {
       NavigationView {
@@ -43,22 +48,14 @@ enum Version1 {
       }
       .navigationViewStyle(StackNavigationViewStyle())
     }
-
-    // MARK: Private
-
-    @State private var notes: [Note] = [
-      .random(),
-      .random(),
-      .random(),
-      .random()
-    ]
   }
 
   struct EditorView: View {
-    // MARK: Internal
-
     @Binding var note: Note
     var onDelete: () -> Void
+
+    @Environment(\.presentationMode) private var presentationMode
+    @State private var isPushingDisplayView = false
 
     var body: some View {
       VStack {
@@ -99,19 +96,13 @@ enum Version1 {
         }
       }
     }
-
-    // MARK: Private
-
-    @Environment(\.presentationMode) private var presentationMode
-
-    @State private var isPushingDisplayView = false
   }
 
   struct DisplayView: View {
-    // MARK: Internal
-
     @Binding var note: Note
     var onDelete: () -> Void
+
+    @Environment(\.presentationMode) private var presentationMode
 
     var body: some View {
       Text(String(note.content))
@@ -143,10 +134,6 @@ enum Version1 {
           }
         }
     }
-
-    // MARK: Private
-
-    @Environment(\.presentationMode) private var presentationMode
   }
 
   struct ListView_Previews: PreviewProvider {

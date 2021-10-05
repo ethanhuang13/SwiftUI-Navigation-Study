@@ -7,20 +7,26 @@ enum SwiftUI_Navigation {
     var body: some View {
       NavigationView {
         VStack {
-          Text("This is A")
-
           NavigationLink(
             isActive: $isPushingBView,
             destination: { BView() },
             label: { Text("Push B") })
         }
+        .navigationBarTitle("This is A", displayMode: .inline)
       }
     }
   }
 
   struct BView: View {
+    @Environment(\.presentationMode) private var presentationMode
+
     var body: some View {
-      Text("This is B")
+      Button(action: {
+        presentationMode.wrappedValue.dismiss()
+      }, label: {
+        Text("Pop")
+      })
+        .navigationBarTitle("This is B", displayMode: .inline)
     }
   }
 

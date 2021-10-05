@@ -49,7 +49,13 @@ enum Version5 {
   }
 
   struct ListView: View {
-    // MARK: Internal
+    @State private var navigation = Navigation()
+    @State private var notes: [Note] = [
+      .random(),
+      .random(),
+      .random(),
+      .random()
+    ]
 
     var body: some View {
       NavigationView {
@@ -57,7 +63,7 @@ enum Version5 {
           LazyVStack {
             Divider()
               .padding(.leading)
-            
+
             ForEach($notes) { note in // Swift 5.5
               HStack {
                 Button(action: {
@@ -119,24 +125,13 @@ enum Version5 {
       .navigationViewStyle(StackNavigationViewStyle())
       .environment(\.navigation, $navigation)
     }
-
-    // MARK: Private
-
-    @State private var navigation = Navigation()
-
-    @State private var notes: [Note] = [
-      .random(),
-      .random(),
-      .random(),
-      .random()
-    ]
   }
 
   struct EditorView: View {
-    // MARK: Internal
-
     @Binding var note: Note
     var onDelete: () -> Void
+
+    @Environment(\.navigation) private var navigation
 
     var body: some View {
       VStack {
@@ -183,17 +178,13 @@ enum Version5 {
         }
       }
     }
-
-    // MARK: Private
-
-    @Environment(\.navigation) private var navigation
   }
 
   struct DisplayView: View {
-    // MARK: Internal
-
     @Binding var note: Note
     var onDelete: () -> Void
+
+    @Environment(\.navigation) private var navigation
 
     var body: some View {
       Text(String(note.content))
@@ -225,10 +216,6 @@ enum Version5 {
           }
         }
     }
-
-    // MARK: Private
-
-    @Environment(\.navigation) private var navigation
   }
 
   struct ListView_Previews: PreviewProvider {

@@ -46,7 +46,13 @@ enum Version6 {
   }
 
   struct ContainerView: View {
-    // MARK: Internal
+    @State private var navigation = Navigation(screens: [.list])
+    @State private var notes: [Note] = [
+      .random(),
+      .random(),
+      .random(),
+      .random()
+    ]
 
     var body: some View {
       NavigationView {
@@ -55,16 +61,6 @@ enum Version6 {
       .navigationViewStyle(StackNavigationViewStyle())
       .environment(\.navigation, $navigation)
     }
-
-    // MARK: Private
-
-    @State private var navigation = Navigation(screens: [.list])
-    @State private var notes: [Note] = [
-      .random(),
-      .random(),
-      .random(),
-      .random()
-    ]
 
     @ViewBuilder
     private func buildCurrentView() -> some View {
@@ -117,9 +113,9 @@ enum Version6 {
   }
 
   struct ListView: View {
-    // MARK: Internal
-
     @Binding var notes: [Note]
+
+    @Environment(\.navigation) private var navigation
 
     var body: some View {
       ScrollView {
@@ -172,17 +168,13 @@ enum Version6 {
         }
       }
     }
-
-    // MARK: Private
-
-    @Environment(\.navigation) private var navigation
   }
 
   struct EditorView: View {
-    // MARK: Internal
-
     @Binding var note: Note
     var onDelete: () -> Void
+
+    @Environment(\.navigation) private var navigation
 
     var body: some View {
       VStack {
@@ -217,17 +209,13 @@ enum Version6 {
         }
       }
     }
-
-    // MARK: Private
-
-    @Environment(\.navigation) private var navigation
   }
 
   struct DisplayView: View {
-    // MARK: Internal
-
     @Binding var note: Note
     var onDelete: () -> Void
+
+    @Environment(\.navigation) private var navigation
 
     var body: some View {
       Text(String(note.content))
@@ -259,10 +247,6 @@ enum Version6 {
           }
         }
     }
-
-    // MARK: Private
-
-    @Environment(\.navigation) private var navigation
   }
 
   struct ListView_Previews: PreviewProvider {

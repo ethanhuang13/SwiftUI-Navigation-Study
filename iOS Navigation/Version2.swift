@@ -15,7 +15,13 @@ enum Version2 {
   }
 
   struct ListView: View {
-    // MARK: Internal
+    @StateObject private var navigation = Navigation()
+    @State private var notes: [Note] = [
+      .random(),
+      .random(),
+      .random(),
+      .random()
+    ]
 
     var body: some View {
       NavigationView {
@@ -60,16 +66,6 @@ enum Version2 {
       }
       .navigationViewStyle(StackNavigationViewStyle())
     }
-
-    // MARK: Private
-
-    @StateObject private var navigation = Navigation()
-    @State private var notes: [Note] = [
-      .random(),
-      .random(),
-      .random(),
-      .random()
-    ]
   }
 
   struct EditorView: View {
