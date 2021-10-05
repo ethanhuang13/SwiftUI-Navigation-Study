@@ -268,6 +268,7 @@ enum Version7 {
         ToolbarItem(placement: .destructiveAction) {
           Button(action: {
             onDelete()
+            navigation.wrappedValue.dismiss(toRoot: true)
           }, label: {
             Image(systemName: "trash")
               .foregroundColor(.red)
