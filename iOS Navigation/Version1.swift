@@ -118,7 +118,7 @@ enum Version1 {
           }
           ToolbarItem(placement: .bottomBar) {
             Button(action: {
-              // Pop to `NoteView`
+              // Pop to `EditorView`
               presentationMode.wrappedValue.dismiss()
             }, label: {
               Image(systemName: "arrowshape.turn.up.backward.fill")
