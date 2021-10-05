@@ -79,8 +79,8 @@ enum Version5 {
 
                 Button(action: {
                   // FIXME: Push to `DisplayView` is not working
-                  navigation.isPushingDisplayView = true
                   navigation.editorViewNoteId = note.wrappedValue.id
+                  navigation.isPushingDisplayView = true // does not work
                 }, label: {
                   Image(systemName: "eyes")
                 })
