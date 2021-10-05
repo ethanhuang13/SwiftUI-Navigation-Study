@@ -73,15 +73,19 @@ enum Version5 {
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
                     .foregroundColor(.primary)
-                  Spacer()
-                  Image(systemName: "chevron.right")
-                    .foregroundColor(.secondary)
                 })
 
-                // TODO: Add another button
-                Button(action: {}, label: {
-                  EmptyView()
+                Spacer()
+
+                Button(action: {
+                  // TODO: Push to `DisplayView`
+                }, label: {
+                  Image(systemName: "eyes")
                 })
+                  .disabled(true)
+
+                Image(systemName: "chevron.right")
+                  .foregroundColor(.secondary)
               }
               .padding(.horizontal)
               .padding(.vertical, 8)
