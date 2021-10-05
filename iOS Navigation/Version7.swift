@@ -53,8 +53,6 @@ enum Version7 {
               index: Int)
     case nothing
 
-    // MARK: Internal
-
     var body: some View {
       screenView
         .background(
@@ -64,8 +62,6 @@ enum Version7 {
             label: { EmptyView() })
         )
     }
-
-    // MARK: Private
 
     private var isActive: Binding<Bool> {
       switch self {
@@ -122,8 +118,6 @@ enum Version7 {
   }
 
   struct ScreenView: View {
-    // MARK: Internal
-
     let screen: Screen
     @Binding var notes: [Note]
 
@@ -141,8 +135,6 @@ enum Version7 {
         }
       }
     }
-
-    // MARK: Private
 
     private func bindingCurrentNote(_ noteId: UUID) -> Binding<Note>? {
       guard let note = notes.first(where: { $0.id == noteId }) else {
@@ -167,7 +159,13 @@ enum Version7 {
   }
 
   struct ContainerView: View {
-    // MARK: Internal
+    @State private var navigation = Navigation(screens: [.list])
+    @State private var notes: [Note] = [
+      .random(),
+      .random(),
+      .random(),
+      .random()
+    ]
 
     var body: some View {
       NavigationView {
@@ -178,22 +176,12 @@ enum Version7 {
       .navigationViewStyle(StackNavigationViewStyle())
       .environment(\.navigation, $navigation)
     }
-
-    // MARK: Private
-
-    @State private var navigation = Navigation(screens: [.list])
-    @State private var notes: [Note] = [
-      .random(),
-      .random(),
-      .random(),
-      .random()
-    ]
   }
 
   struct ListView: View {
-    // MARK: Internal
-
     @Binding var notes: [Note]
+
+    @Environment(\.navigation) private var navigation
 
     var body: some View {
       ScrollView {
@@ -246,17 +234,13 @@ enum Version7 {
         }
       }
     }
-
-    // MARK: Private
-
-    @Environment(\.navigation) private var navigation
   }
 
   struct EditorView: View {
-    // MARK: Internal
-
     @Binding var note: Note
     var onDelete: () -> Void
+
+    @Environment(\.navigation) private var navigation
 
     var body: some View {
       VStack {
@@ -284,7 +268,6 @@ enum Version7 {
         ToolbarItem(placement: .destructiveAction) {
           Button(action: {
             onDelete()
-            navigation.wrappedValue.dismiss(toRoot: true)
           }, label: {
             Image(systemName: "trash")
               .foregroundColor(.red)
@@ -292,17 +275,13 @@ enum Version7 {
         }
       }
     }
-
-    // MARK: Private
-
-    @Environment(\.navigation) private var navigation
   }
 
   struct DisplayView: View {
-    // MARK: Internal
-
     @Binding var note: Note
     var onDelete: () -> Void
+
+    @Environment(\.navigation) private var navigation
 
     var body: some View {
       Text(String(note.content))
@@ -335,10 +314,6 @@ enum Version7 {
           }
         }
     }
-
-    // MARK: Private
-
-    @Environment(\.navigation) private var navigation
   }
 
   struct ListView_Previews: PreviewProvider {
