@@ -78,11 +78,12 @@ enum Version5 {
                 Spacer()
 
                 Button(action: {
-                  // TODO: Push to `DisplayView`
+                  // FIXME: Push to `DisplayView` is not working
+                  navigation.isPushingDisplayView = true
+                  navigation.editorViewNoteId = note.wrappedValue.id
                 }, label: {
                   Image(systemName: "eyes")
                 })
-                  .disabled(true)
 
                 Image(systemName: "chevron.right")
                   .foregroundColor(.secondary)
