@@ -1,0 +1,13 @@
+@Tutorials(name: "Tutorial") {
+    @Intro(title: "SwiftUI Navigation Study Tutorial") {
+        Step-by-step tutorials.
+        
+        See project README for more information.
+    }
+    
+    @Chapter(name: "Navigation") {
+        Change SwiftUI Navigation step-by-step.
+        
+        @TutorialReference(tutorial: "doc:Tutorial")
+    }
+}

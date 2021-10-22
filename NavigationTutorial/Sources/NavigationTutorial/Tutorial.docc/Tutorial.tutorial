@@ -1,0 +1,56 @@
+@Tutorial(time: 40) {
+    @Intro(title: "Navigation") {
+        There are 7 versions(steps) of navigation implementation.
+        
+        Scroll down to see difference of each versions.
+    }
+    
+    @Section(title: "Navigation") {
+        @ContentAndMedia {
+        }
+        
+        @Steps {
+            @Step {
+                Version 1 依照原生 SwiftUI 做 navigation 基本款
+                
+                @Code(name: "Version 1.swift", file: Version1.swift)
+            }
+            
+            @Step {
+                Version 2 寫個 `class Navigation: ObservableObject` 把 push 的狀態放進去
+                
+                @Code(name: "Version 2.swift", file: Version2.swift, previousFile: Version1.swift)
+            }
+            
+            @Step {
+                Version 3 把 `class Navigation` 改成 value type
+                
+                @Code(name: "Version 3.swift", file: Version3.swift, previousFile: Version2.swift)
+            }
+            
+            @Step {
+                Version 4 Custom Environment
+                
+                @Code(name: "Version 4.swift", file: Version4.swift, previousFile: Version3.swift)
+            }
+            
+            @Step {
+                Version 5 Refactor `Navigation` and `ListView`
+                
+                @Code(name: "Version 5.swift", file: Version5.swift, previousFile: Version4.swift)
+            }
+            
+            @Step {
+                Version 6 How about push freely?
+                
+                @Code(name: "Version 6.swift", file: Version6.swift, previousFile: Version5.swift)
+            }
+            
+            @Step {
+                Version 7 Introducing [FlowStacks](https://github.com/johnpatrickmorgan/FlowStacks) by [johnpatrickmorgan](https://github.com/johnpatrickmorgan)
+                
+                @Code(name: "Version 7.swift", file: Version7.swift, previousFile: Version6.swift)
+            }
+        }
+    }
+}

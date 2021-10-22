@@ -18,6 +18,7 @@
 		6C506912270C152300CEDB60 /* SwiftUI_Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C506911270C152300CEDB60 /* SwiftUI_Navigation.swift */; };
 		6C9C85332709C2F9002A692F /* Version2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9C85322709C2F9002A692F /* Version2.swift */; };
 		6C9C85352709C363002A692F /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9C85342709C363002A692F /* Note.swift */; };
+		6CC472672723024700CF1CCF /* NavigationTutorial in Frameworks */ = {isa = PBXBuildFile; productRef = 6CC472662723024700CF1CCF /* NavigationTutorial */; };
 		6CF6D9012709A3C10073EE55 /* NavApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CF6D8F12709A3BF0073EE55 /* NavApp.swift */; };
 		6CF6D9022709A3C10073EE55 /* NavApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CF6D8F12709A3BF0073EE55 /* NavApp.swift */; };
 		6CF6D9032709A3C10073EE55 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CF6D8F22709A3BF0073EE55 /* ContentView.swift */; };
@@ -39,6 +40,8 @@
 		6C506911270C152300CEDB60 /* SwiftUI_Navigation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftUI_Navigation.swift; sourceTree = "<group>"; };
 		6C9C85322709C2F9002A692F /* Version2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Version2.swift; sourceTree = "<group>"; };
 		6C9C85342709C363002A692F /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
+		6CC472622723020900CF1CCF /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		6CC472642723022500CF1CCF /* NavigationTutorial */ = {isa = PBXFileReference; lastKnownFileType = folder; path = NavigationTutorial; sourceTree = "<group>"; };
 		6CF6D8F12709A3BF0073EE55 /* NavApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavApp.swift; sourceTree = "<group>"; };
 		6CF6D8F22709A3BF0073EE55 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		6CF6D8F32709A3C10073EE55 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -53,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6CC472672723024700CF1CCF /* NavigationTutorial in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -77,14 +81,32 @@
 			path = "Compare UIKit and SwiftUI";
 			sourceTree = "<group>";
 		};
+		6CC472632723022500CF1CCF /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				6CC472642723022500CF1CCF /* NavigationTutorial */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		6CC472652723024200CF1CCF /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		6CF6D8EB2709A3BF0073EE55 = {
 			isa = PBXGroup;
 			children = (
+				6CC472632723022500CF1CCF /* Packages */,
+				6CC472622723020900CF1CCF /* README.md */,
 				6CF6D90F2709A3E20073EE55 /* iOS Navigation */,
 				6C50690C270C11A800CEDB60 /* Compare UIKit and SwiftUI */,
 				6CF6D8F02709A3BF0073EE55 /* Shared */,
 				6CF6D8FF2709A3C10073EE55 /* macOS */,
 				6CF6D8F92709A3C10073EE55 /* Products */,
+				6CC472652723024200CF1CCF /* Frameworks */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -148,6 +170,9 @@
 			dependencies = (
 			);
 			name = "Nav (iOS)";
+			packageProductDependencies = (
+				6CC472662723024700CF1CCF /* NavigationTutorial */,
+			);
 			productName = "Nav (iOS)";
 			productReference = 6CF6D8F82709A3C10073EE55 /* Nav.app */;
 			productType = "com.apple.product-type.application";
@@ -518,6 +543,13 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		6CC472662723024700CF1CCF /* NavigationTutorial */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NavigationTutorial;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 6CF6D8EC2709A3BF0073EE55 /* Project object */;
 }
